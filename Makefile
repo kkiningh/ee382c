@@ -1,4 +1,4 @@
-BUILD_DIR = build
+BUILD_DIR = ./build
 
 # First target is default
 .PHONY: all
@@ -46,12 +46,22 @@ $(BUILD_DIR)/simv.vcd: $(SIMV)
 	$(SIMV) -q +vpdfile+$@ -k $(SIMV_BUILD)/ucli.key # +vcs+dumparrays +vcs+dumpvars
 
 ### Synthesis
+DCS_TOP      = router_wrap
+DCS_BUILD    = $(BUILD_DIR)
+DCS_SCRIPT   = ./tcl/syn-router.tcl
+
 DCS          = dc_shell-xg-t -64bit # Always use 64-bit DCS
 DCS_OPTIONS += -topographical       # Use topograpical mode
 
-$(BUILD_DIR)/synthesis: $(SYNTH_TOP) $(SYNTH_SCRIPT)
-	@mkdir -p $(BUILD_DIR)/synthesis -f $(SYNTH_SCRIPT)
-	$(DCS) $(DCS_OPTIONS)
+.PHONY: synth
+synth: $(DCS_BUILD)/data/$(DCS_TOP).synthesis.v
+
+$(DCS_BUILD)/data/$(DCS_TOP).synthesis.v: $(DCS_SCRIPT)
+	@mkdir -p $(DCS_BUILD)
+	@mkdir -p $(DCS_BUILD)/data
+	@mkdir -p $(DCS_BUILD)/reports
+	@mkdir -p $(DCS_BUILD)/reports/synthesis
+	$(DCS) $(DCS_OPTIONS) -x "set BUILD_DIR $(DCS_BUILD)" -f $(DCS_SCRIPT)
 
 .PHONY: clean
 clean:
