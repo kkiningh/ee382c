@@ -288,8 +288,8 @@ lappend dont_use(sc7_ce018fg_base_rvt_*) *_XL_*
 # Tool reporting defaults
 # -----------------------------------------------------------------------------------
 
-# Increase the precision of timing reports to 3 significant digits
-# Note: *decreases* precision of area reports to 3 from 6 significant digits
-set report_default_significant_digits 3
+# Increase the precision of timing reports to 4 significant digits
+# Note: *decreases* precision of area reports to 4 from 6 significant digits
+set report_default_significant_digits 4
 
 # End of File
