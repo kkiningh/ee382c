@@ -1,11 +1,11 @@
 # Setup the technology libraries, Milkyway database, tech map, etc
-source common-setup.tcl
+source ./tcl/common-setup.tcl
 
 # ------------------------------------------------------------------------------
 # Setup for Formality verification
 # ------------------------------------------------------------------------------
 
-set_svf ${BUILD_DIR}/data/${project_top}.synthesis.svf
+set_svf ${BUILD_DIR}/data/${TOP}.synthesis.svf
 
 # ------------------------------------------------------------------------------
 # Setup for SAIF name mapping database
@@ -23,11 +23,11 @@ saif_map -start
 
 # The search path specifies where dc_shell will look for referenced designs 
 # as well as include files.
-set_app_var search_path [concat $search_path ./src/router/ ./src/clib/]
+set_app_var search_path [concat $search_path ./verif/mesh_generate/ ./src/router/ ./src/clib/]
 
 # The set of directories that contain verilog source files. Can also contain
 # individual source files in seperate directories
-set src_directories { ./src/router/ ./src/clib/ }
+set src_directories { ./verif/mesh_generate/ ./src/router/ ./src/clib/ }
 
 # The set of verilog files that should not be considered for analysis. This 
 # should only be inlcude files or files that don't actually contain verilog.
@@ -57,13 +57,13 @@ define_design_lib work -path ${BUILD_DIR}/work
 # Analyze reads in the specified verilog source files and creates a technology
 # independent representation in memory. Any verilog errors (should) get
 # reported here
-analyze $src_directories -autoread -top $project_top
+analyze $src_directories -autoread -top $TOP
 
 # Elabortate the design.
-elaborate -architecture verilog $project_top
+elaborate -architecture verilog $TOP
 
 # Link the design 
-current_design $project_top
+current_design $TOP
 link
 
 check_design -no_warnings
@@ -133,10 +133,10 @@ echo "Defined clock VCLK"
 # ------------------------------------------------------------------------------
 
 # Set the maximum fanout value on the design
-set_max_fanout ${max_fanout} $project_top
+set_max_fanout ${max_fanout} $TOP
 
 # Set the maximum transition value on the design
-set_max_transition $max_transition($slow_corner_pvt) $project_top
+set_max_transition $max_transition($slow_corner_pvt) $TOP
 
 # Load all outputs with suitable capacitance
 set_load $output_load [all_outputs]
@@ -194,7 +194,7 @@ group_path -name Regs_to_Regs -from [all_registers] -to [all_registers]
 # A SAIF file can be used for power optimization. Without this a default toggle
 # rate of 0.1 will be used for propagating switching activity
 # read_saif -auto_map_names -input \
-#   ${BUILD_DIR}/data/${project_top}.saif -instance ${project_top} -verbose
+#   ${BUILD_DIR}/data/${TOP}.saif -instance ${TOP} -verbose
 
 # Setting power constraints will automatically enable power prediction using
 # clock tree estimation.
@@ -242,7 +242,7 @@ set_auto_disable_drc_nets -constant false
 set_fix_multiple_port_nets -all -buffer_constants [get_designs]
 
 # Critical range for core
-set_critical_range [expr 0.10 * ${clock_period} ] ${project_top}
+set_critical_range [expr 0.10 * ${clock_period} ] ${TOP}
 
 # Isolate the ports for accurate timing model creation
 set clock_ports [filter_collection [get_attribute [get_clocks] sources] object_class==port]
@@ -267,12 +267,12 @@ compile_ultra -scan -gate_clock -no_autoungroup
 # If this will be a sub-block in a hierarchical design, uniquify with block
 # unique names to avoid name collisions when integrating the design at the top
 # level
-set_app_var uniquify_naming_style ${project_top}_%s_%d
+set_app_var uniquify_naming_style ${TOP}_%s_%d
 uniquify -force
 
 define_name_rules verilog -case_insensitive
 change_names -rules verilog -hierarchy -verbose > \
-    ${BUILD_DIR}/reports/synthesis/${project_top}.change_names
+    ${BUILD_DIR}/reports/synthesis/${TOP}.change_names
 
 # ------------------------------------------------------------------------------
 # Write out design data
@@ -281,8 +281,8 @@ change_names -rules verilog -hierarchy -verbose > \
 set_app_var verilogout_higher_designs_first true
 set_app_var verilogout_no_tri true
 
-write -format ddc -hierarchy -output ${BUILD_DIR}/data/${project_top}.synthesis.ddc
-write -f verilog  -hierarchy -output ${BUILD_DIR}/data/${project_top}.synthesis.v
+write -format ddc -hierarchy -output ${BUILD_DIR}/data/${TOP}.synthesis.ddc
+write -f verilog  -hierarchy -output ${BUILD_DIR}/data/${TOP}.synthesis.v
 
 # ------------------------------------------------------------------------------
 # Write out design data
@@ -292,35 +292,35 @@ write -f verilog  -hierarchy -output ${BUILD_DIR}/data/${project_top}.synthesis.
 set_svf -off
 
 # Write parasitics data from DCT placement for static timing analysis
-write_parasitics -output ${BUILD_DIR}/data/${project_top}.synthesis.spef
+write_parasitics -output ${BUILD_DIR}/data/${TOP}.synthesis.spef
 
 # Write SDF backannotation data from DCT placement for static timing analysis
-write_sdf ${BUILD_DIR}/data/${project_top}.synthesis.sdf
+write_sdf ${BUILD_DIR}/data/${TOP}.synthesis.sdf
 
 # Do not write out net RC info into SDC
 set_app_var write_sdc_output_lumped_net_capacitance false
 set_app_var write_sdc_output_net_resistance false
 
 # Write out SDC version 1.7 to omit set_voltage for backwards compatibility
-write_sdc -version 1.7 -nosplit ${BUILD_DIR}/data/${project_top}.synthesis.sdc
+write_sdc -version 1.7 -nosplit ${BUILD_DIR}/data/${TOP}.synthesis.sdc
 
 # If SAIF is used, write out SAIF name mapping file for PrimeTime-PX
-saif_map -type ptpx -write_map ${BUILD_DIR}/reports/synthesis/${project_top}_SAIF.namemap
+saif_map -type ptpx -write_map ${BUILD_DIR}/reports/synthesis/${TOP}_SAIF.namemap
 
 # ------------------------------------------------------------------------------
 # Write final reports
 # ------------------------------------------------------------------------------
 
-printvar > ${BUILD_DIR}/reports/synthesis/${project_top}.vars
+printvar > ${BUILD_DIR}/reports/synthesis/${TOP}.vars
 
 check_design -multiple_designs > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.check_design
+  ${BUILD_DIR}/reports/synthesis/${TOP}.check_design
 
 check_timing > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.check_timing
+  ${BUILD_DIR}/reports/synthesis/${TOP}.check_timing
 
 report_qor > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.qor
+  ${BUILD_DIR}/reports/synthesis/${TOP}.qor
 
 report_timing -delay max \
               -max_paths 50 \
@@ -330,11 +330,11 @@ report_timing -delay max \
               -nets \
               -transition_time \
               -input_pins > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.timing-max
+  ${BUILD_DIR}/reports/synthesis/${TOP}.timing-max
 
 # Create compacted version of the timing report showing only nets
-set fr [open ${BUILD_DIR}/reports/synthesis/${project_top}.timing-max r]
-set fw [open ${BUILD_DIR}/reports/synthesis/${project_top}.timing-max-nets w]
+set fr [open ${BUILD_DIR}/reports/synthesis/${TOP}.timing-max r]
+set fw [open ${BUILD_DIR}/reports/synthesis/${TOP}.timing-max-nets w]
 
 while {[gets $fr line] >= 0} {
     if {[regexp {delay} $line] ||
@@ -359,62 +359,62 @@ close $fr
 close $fw
 
 report_timing -loops > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.loops
+  ${BUILD_DIR}/reports/synthesis/${TOP}.loops
 
 report_area -nosplit \
             -hierarchy \
             -physical > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.area
+  ${BUILD_DIR}/reports/synthesis/${TOP}.area
 
 report_power -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.power
+  ${BUILD_DIR}/reports/synthesis/${TOP}.power
 
 report_constraint -all_violators \
                   -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.constraint_violators
+  ${BUILD_DIR}/reports/synthesis/${TOP}.constraint_violators
 
 report_design > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.design_attributes
+  ${BUILD_DIR}/reports/synthesis/${TOP}.design_attributes
 
 report_clocks -attributes \
               -skew > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.clocks
+  ${BUILD_DIR}/reports/synthesis/${TOP}.clocks
 
 report_clock_gating -multi_stage \
                     -verbose \
                     -gated \
                     -ungated \
-  > ${BUILD_DIR}/reports/synthesis/${project_top}.clock_gating
+  > ${BUILD_DIR}/reports/synthesis/${TOP}.clock_gating
 
 report_clock_tree -summary \
                   -settings \
                   -structure > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.clock_tree
+  ${BUILD_DIR}/reports/synthesis/${TOP}.clock_tree
 
 query_objects -truncate 0 [all_registers -level_sensitive ] \
-  > ${BUILD_DIR}/reports/synthesis/${project_top}.latches
+  > ${BUILD_DIR}/reports/synthesis/${TOP}.latches
 
 report_isolate_ports -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.isolate_ports
+  ${BUILD_DIR}/reports/synthesis/${TOP}.isolate_ports
 
 report_net_fanout -threshold 32 -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.high_fanout_nets
+  ${BUILD_DIR}/reports/synthesis/${TOP}.high_fanout_nets
 
 report_port -verbose \
             -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.port
+  ${BUILD_DIR}/reports/synthesis/${TOP}.port
 
 report_hierarchy > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.hierarchy
+  ${BUILD_DIR}/reports/synthesis/${TOP}.hierarchy
 
 report_resources -hierarchy > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.resources
+  ${BUILD_DIR}/reports/synthesis/${TOP}.resources
 
 report_compile_options > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.compile_options
+  ${BUILD_DIR}/reports/synthesis/${TOP}.compile_options
 
 report_congestion > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}.congestion
+  ${BUILD_DIR}/reports/synthesis/${TOP}.congestion
 
 # Zero interconnect delay mode to investigate potential design/floorplan problems
 set_zero_interconnect_delay_mode true
@@ -425,8 +425,8 @@ report_timing -delay max \
               -nets \
               -transition_time \
               -input_pins > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}_zero-interconnect.timing
+  ${BUILD_DIR}/reports/synthesis/${TOP}_zero-interconnect.timing
 
 report_qor > \
-  ${BUILD_DIR}/reports/synthesis/${project_top}_zero-interconnect.qor
+  ${BUILD_DIR}/reports/synthesis/${TOP}_zero-interconnect.qor
 set_zero_interconnect_delay_mode false

@@ -7,8 +7,8 @@ all: $(BUILD_DIR)/simv.vcd
 ### Simulation
 SIMV		= $(BUILD_DIR)/simv
 SIMV_BUILD	= $(BUILD_DIR)/simv-build
-SIMV_TEST	= mesh_3x3
-SIMV_TOP	= verif/$(SIMV_TEST)/testbench.v
+SIMV_TEST	= mesh_generate
+SIMV_TOP	= verif/$(SIMV_TEST)/interconnect.v
 SIMV_LIBS	= ./verif/$(SIMV_TEST) \
 			  ./src/clib \
 			  ./src/router \
@@ -46,7 +46,7 @@ $(BUILD_DIR)/simv.vcd: $(SIMV)
 	$(SIMV) -q +vpdfile+$@ -k $(SIMV_BUILD)/ucli.key # +vcs+dumparrays +vcs+dumpvars
 
 ### Synthesis
-DCS_TOP      = router_wrap
+DCS_TOP      = interconnect
 DCS_BUILD    = $(BUILD_DIR)
 DCS_SCRIPT   = ./tcl/syn-router.tcl
 
@@ -61,7 +61,9 @@ $(DCS_BUILD)/data/$(DCS_TOP).synthesis.v: $(DCS_SCRIPT)
 	@mkdir -p $(DCS_BUILD)/data
 	@mkdir -p $(DCS_BUILD)/reports
 	@mkdir -p $(DCS_BUILD)/reports/synthesis
-	$(DCS) $(DCS_OPTIONS) -x "set BUILD_DIR $(DCS_BUILD)" -f $(DCS_SCRIPT)
+	$(DCS) $(DCS_OPTIONS) \
+		-x "set BUILD_DIR $(DCS_BUILD); set TOP $(DCS_TOP)" \
+		-f $(DCS_SCRIPT)
 
 .PHONY: clean
 clean:

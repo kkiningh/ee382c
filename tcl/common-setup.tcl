@@ -1,5 +1,4 @@
 set sh_script_stop_severity E
-set project_top router_wrap
 
 ################################################################################
 # Technology Libraries
@@ -73,7 +72,7 @@ set_app_var mw_reference_library [concat $stdcell_mw_library]
 
 # This variable controls the folder dc_shell uses to save the Milkyway views of
 # cells defined in the current design.
-set_app_var mw_design_library ${BUILD_DIR}/$project_top
+set_app_var mw_design_library ${BUILD_DIR}/$TOP
 
 create_mw_lib -technology $tech_file \
               -bus_naming_style {[%d]} \
