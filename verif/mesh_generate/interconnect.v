@@ -56,9 +56,9 @@ module interconnect(clk, reset, injection_channels, injection_flow_ctrl, ejectio
 
 	//wires that are connected to the flit_sink and packet_source modules
     input [0:(num_routers*channel_width)-1] injection_channels;
-    input [0:(num_routers*flow_ctrl_width)-1] injection_flow_ctrl;
+    output [0:(num_routers*flow_ctrl_width)-1] injection_flow_ctrl;
     output [0:(num_routers*channel_width)-1] ejection_channels;
-    output [0:(num_routers*flow_ctrl_width)-1] ejection_flow_ctrl;
+    input [0:(num_routers*flow_ctrl_width)-1] ejection_flow_ctrl;
 
     wire [0:num_routers-1]				    rtr_error;
 
