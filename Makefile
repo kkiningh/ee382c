@@ -5,12 +5,13 @@ all: synth
 ### Testcase to generate 
 TESTCASE   ?= mesh_generate
 BUILD_DIR 	= ./build/$(TESTCASE)
+TEST_DIR    = ./verif/$(TESTCASE)
 
 ### Simulation
 SIMV		= $(BUILD_DIR)/simv
 SIMV_BUILD	= $(BUILD_DIR)/simv-build
 SIMV_TOP	= verif/$(TESTCASE)/testbench.v
-SIMV_LIBS	= ./verif/$(TESTCASE) \
+SIMV_LIBS	= $(TEST_DIR) \
 			  ./src/clib \
 			  ./src/router \
 			  $$SYNOPSYS/dw/sim_ver
@@ -73,7 +74,7 @@ $(DCS_BUILD)/data/$(DCS_TOP).synthesis.v: $(DCS_SCRIPT) $(SAIF_PATH)
 	@mkdir -p $(DCS_BUILD)/reports
 	@mkdir -p $(DCS_BUILD)/reports/synthesis
 	$(DCS) $(DCS_OPTIONS) \
-		-x "set BUILD_DIR $(DCS_BUILD); set TOP $(DCS_TOP); set SAIF_PATH $(SAIF_PATH)" \
+		-x "set BUILD_DIR $(DCS_BUILD); set TOP $(DCS_TOP); set SAIF_PATH $(SAIF_PATH); set TEST_DIR $(TEST_DIR)" \
 		-f $(DCS_SCRIPT)
 
 .PHONY: clean

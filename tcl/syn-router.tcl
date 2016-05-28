@@ -23,11 +23,11 @@ saif_map -start
 
 # The search path specifies where dc_shell will look for referenced designs 
 # as well as include files.
-set_app_var search_path [concat $search_path ./verif/mesh_generate/ ./src/router/ ./src/clib/]
+set_app_var search_path [concat $search_path ${TEST_DIR} ./src/router/ ./src/clib/]
 
 # The set of directories that contain verilog source files. Can also contain
 # individual source files in seperate directories
-set src_directories { ./verif/mesh_generate/ ./src/router/ ./src/clib/ }
+set src_directories { ${TEST_DIR} ./src/router/ ./src/clib/ }
 
 # The set of verilog files that should not be considered for analysis. This 
 # should only be inlcude files or files that don't actually contain verilog.
