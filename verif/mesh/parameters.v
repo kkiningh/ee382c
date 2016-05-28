@@ -45,11 +45,7 @@ parameter num_resource_classes = 1;
 parameter num_vcs_per_class = 4;
 
 // total number of nodes
-parameter num_nodes = 9;    // changed to 2
-
-// (Raejoon: added for automated address and wiring)
-parameter topo_width = 3;
-parameter topo_height = 3;
+parameter num_nodes = 4;    // changed to 2
 
 // number of dimensions in network
 parameter num_dimensions = 2;
