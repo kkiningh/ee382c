@@ -7,7 +7,7 @@ all: $(BUILD_DIR)/simv.vcd
 ### Simulation
 SIMV		= $(BUILD_DIR)/simv
 SIMV_BUILD	= $(BUILD_DIR)/simv-build
-SIMV_TEST	= mesh_generate
+SIMV_TEST	= fbfly_generate
 SIMV_TOP	= verif/$(SIMV_TEST)/interconnect.v
 SIMV_LIBS	= ./verif/$(SIMV_TEST) \
 			  ./src/clib \
