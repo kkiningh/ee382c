@@ -46,7 +46,7 @@ set_app_var link_library [concat * $target_library $synthetic_library]
 # The alib library is a pesudo library containing a DC generated 
 # characterization of the target library. Generating this library can lead to
 # better synthesis at the expense of extra build time on the first compile
-set alib_library_analysis_path ${BUILD_DIR}/tech/alib/
+set alib_library_analysis_path ${libs}/synopsys-alib/
 
 # Generate the alib library if it does not already exist
 alib_analyze_libs

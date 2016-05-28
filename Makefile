@@ -1,15 +1,16 @@
-BUILD_DIR = ./build
-
 # First target is default
 .PHONY: all
 all: synth
 
+### Testcase to generate 
+TESTCASE   ?= mesh_generate
+BUILD_DIR 	= ./build/$(TESTCASE)
+
 ### Simulation
 SIMV		= $(BUILD_DIR)/simv
 SIMV_BUILD	= $(BUILD_DIR)/simv-build
-SIMV_TEST	= mesh_generate
-SIMV_TOP	= verif/$(SIMV_TEST)/testbench.v
-SIMV_LIBS	= ./verif/$(SIMV_TEST) \
+SIMV_TOP	= verif/$(TESTCASE)/testbench.v
+SIMV_LIBS	= ./verif/$(TESTCASE) \
 			  ./src/clib \
 			  ./src/router \
 			  $$SYNOPSYS/dw/sim_ver

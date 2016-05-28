@@ -161,26 +161,26 @@ if {[info exists sh_launch_dir] == 0} {
   set sh_launch_dir "."
 }
 
-set libs /afs/.ir/users/k/k/kkiningh/Research/CESEL/gate_libs
+set libs /afs/.ir/users/k/k/kkiningh/Research/CESEL/gate_libs/arm/tsmc/ce018fg
 
 # -----------------------------------------------------------------------------
 # Techfile and metal stack extract models
 # -----------------------------------------------------------------------------
 
-set tech_file             ${libs}/arm/tsmc/ce018fg/arm_tech/r5p1/milkyway/6lm/sc7_tech.tf
-set tf2itf_map_file       ${libs}/arm/tsmc/ce018fg/arm_tech/r5p1/synopsys_tluplus/6lm/tluplus.map
+set tech_file             ${libs}/arm_tech/r5p1/milkyway/6lm/sc7_tech.tf
+set tf2itf_map_file       ${libs}/arm_tech/r5p1/synopsys_tluplus/6lm/tluplus.map
 
 # Keyed from '$extraction'
 
-set tluplus_file(typical) ${libs}/arm/tsmc/ce018fg/arm_tech/r5p1/synopsys_tluplus/6lm/typical.tluplus
+set tluplus_file(typical) ${libs}/arm_tech/r5p1/synopsys_tluplus/6lm/typical.tluplus
 
 # -----------------------------------------------------------------------------
 # Library search path and Milkyway locations
 # -----------------------------------------------------------------------------
 
-set stdcell_search_path [ list ${libs}/arm/tsmc/ce018fg/sc7_base_rvt/r9p0-01eac0/db ]
+set stdcell_search_path [ list ${libs}/sc7_base_rvt/r9p0-01eac0/db ]
 
-set stdcell_mw_library  [ list ${libs}/arm/tsmc/ce018fg/sc7_base_rvt/r9p0-01eac0/milkyway/6lm/sc7_ce018fg_base_rvt ]
+set stdcell_mw_library  [ list ${libs}/sc7_base_rvt/r9p0-01eac0/milkyway/6lm/sc7_ce018fg_base_rvt ]
 
 # -----------------------------------------------------------------------------
 # NLDM .db filenames
@@ -231,7 +231,7 @@ set target_library_name(tt_1p80v_25c)       sc7_ce018fg_base_rvt_tt_typical_max_
 # -----------------------------------------------------------------------------
 
 set tmax_library [ list \
-                        ${libs}/arm/tsmc/ce018fg/sc7_base_rvt/r9p0-01eac0/tetramax/sc7_ce018fg_base_rvt.tv \
+                        ${libs}/sc7_base_rvt/r9p0-01eac0/tetramax/sc7_ce018fg_base_rvt.tv \
                        ]
 
 # -----------------------------------------------------------------------------
