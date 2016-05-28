@@ -1,4 +1,4 @@
-module interconnect(clk, reset, injection_channels, injection_flow_ctrl, ejection_channels, ejection_flow_ctrl);
+module interconnect(clk, reset, injection_channels, injection_flow_ctrl, ejection_channels, ejection_flow_ctrl, rtr_error);
 
 `include "c_functions.v"
 `include "c_constants.v"
@@ -60,7 +60,7 @@ module interconnect(clk, reset, injection_channels, injection_flow_ctrl, ejectio
     output [0:(num_routers*channel_width)-1] ejection_channels;
     input [0:(num_routers*flow_ctrl_width)-1] ejection_flow_ctrl;
 
-    wire [0:num_routers-1]				    rtr_error;
+    output [0:num_routers-1]				    rtr_error;
 
     genvar i;
     generate
