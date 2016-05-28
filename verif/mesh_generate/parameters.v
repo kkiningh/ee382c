@@ -51,6 +51,9 @@ parameter topo_height = 2;
 // total number of nodes
 parameter num_nodes = topo_width * topo_height;
 
+// total number of nodes
+parameter num_nodes = 9;    // changed to 2
+
 // number of dimensions in network
 parameter num_dimensions = 2;
 

@@ -193,8 +193,10 @@ group_path -name Regs_to_Regs -from [all_registers] -to [all_registers]
 
 # A SAIF file can be used for power optimization. Without this a default toggle
 # rate of 0.1 will be used for propagating switching activity
-# read_saif -auto_map_names -input \
-#   ${BUILD_DIR}/data/${TOP}.saif -instance ${TOP} -verbose
+read_saif -auto_map_names -input ${SAIF_PATH} -instance testbench/${TOP}_inst -verbose
+
+# Propagate the saif switching factors using static analyisis
+#propagate_switching_activity -effort high
 
 # Setting power constraints will automatically enable power prediction using
 # clock tree estimation.
@@ -366,8 +368,17 @@ report_area -nosplit \
             -physical > \
   ${BUILD_DIR}/reports/synthesis/${TOP}.area
 
-report_power -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.power
+# Report overall average power broken down by dynamic and static usage
+report_power -nosplit \
+  > ${BUILD_DIR}/reports/synthesis/${TOP}.power
+
+# Report the worst power users in the design
+report_power -nosplit -cell -nworst 20 \
+  >> ${BUILD_DIR}/reports/synthesis/${TOP}.power
+
+# Report a detailed breakdown of all elements to the hierarchy depth given
+report_power -nosplit -hierarchy -hier_level 2 \
+  >> ${BUILD_DIR}/reports/synthesis/${TOP}.power
 
 report_constraint -all_violators \
                   -nosplit > \
