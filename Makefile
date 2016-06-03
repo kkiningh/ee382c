@@ -1,9 +1,9 @@
 # First target is default
-.PHONY: all
+.PHONY: sim
 all: synth
 
 ### Testcase to generate 
-TESTCASE   ?= mesh_generate
+TESTCASE   ?= fbfly_generate
 BUILD_DIR 	= ./build/$(TESTCASE)
 TEST_DIR    = ./verif/$(TESTCASE)
 

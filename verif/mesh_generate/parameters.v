@@ -30,7 +30,7 @@
 //==============================================================================
 
 // select network topology
-parameter topology = `TOPOLOGY_MESH
+parameter topology = `TOPOLOGY_TORUS;
 
 // total buffer size per port in flits
 parameter buffer_size = 64;
@@ -45,14 +45,11 @@ parameter num_resource_classes = 1;
 parameter num_vcs_per_class = 4;
 
 // (Raejoon: added for automated address and wiring)
-parameter topo_width = 2;
-parameter topo_height = 2;
+parameter topo_width = 4;
+parameter topo_height = 4;
 
 // total number of nodes
 parameter num_nodes = topo_width * topo_height;
-
-// total number of nodes
-parameter num_nodes = 9;    // changed to 2
 
 // number of dimensions in network
 parameter num_dimensions = 2;

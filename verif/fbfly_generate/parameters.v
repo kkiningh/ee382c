@@ -45,8 +45,8 @@ parameter num_resource_classes = 1;
 parameter num_vcs_per_class = 4;
 
 // (Raejoon: added for automated address and wiring)
-parameter topo_width = 2;
-parameter topo_height = 2;
+parameter topo_width = 3;
+parameter topo_height = 3;
 
 // total number of nodes
 parameter num_nodes = topo_width * topo_height;

@@ -207,11 +207,9 @@ module rtr_route_filter
 			 end
 		       
 		    end
-		  
 		  // handle injection/ejection ports
 		  else
 		    begin
-		       
 		       // a packet coming in on an injection/ejection port 
 		       // should never exit the router on the same port
 		       if(op == port_id)
@@ -220,12 +218,12 @@ module rtr_route_filter
 			    assign error_op[op] = route_in_op[op];
 			 end
 		       else
+               if (op != port_id)
 			 begin
 			    assign route_out_op[op] = route_in_op[op];
 			    assign error_op[op] = 1'b0;
 			 end
 		    end
-		  
 	       end
 	     
 	   endcase
@@ -291,8 +289,10 @@ module rtr_route_filter
      begin
 	
 	if(error_invalid_port)
+    begin
 	  $display({"ERROR: Received flit's destination port violates ",
 		    "constraints in module %m."});
+  end
 	
 	if(error_invalid_class)
 	  $display({"ERROR: Received flit's destination class violates ",

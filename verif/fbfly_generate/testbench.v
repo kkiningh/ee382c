@@ -85,6 +85,8 @@ module testbench();
     // number of input and output ports on router
     localparam num_ports
     = num_dimensions * num_neighbors_per_dim + num_nodes_per_router;
+
+    localparam node_port = num_ports - 1;
     
     // width required to select individual port
     localparam port_idx_width = clogb(num_ports);
@@ -209,7 +211,7 @@ module testbench();
             .fb_mgmt_type(fb_mgmt_type),
             .disable_static_reservations(disable_static_reservations),
             .elig_mask(elig_mask),
-            .port_id(4), //hardcoded to the injection port, port 4
+            .port_id(node_port), //hardcoded to the injection port, port 4
             .reset_type(reset_type)
         ) ps (
             .clk(clk),
