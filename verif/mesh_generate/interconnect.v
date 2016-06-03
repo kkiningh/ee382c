@@ -6,6 +6,11 @@ module interconnect(clk, reset, injection_channels, injection_flow_ctrl, ejectio
 `include "vcr_constants.v"
 `include "parameters.v"
 
+    // added by Raejoon
+    parameter topo_width = 4;
+    parameter topo_height = 4;
+    parameter num_nodes = topo_width*topo_height;
+
    // total number of packet classes
    localparam num_packet_classes = num_message_classes * num_resource_classes;
    
