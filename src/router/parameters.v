@@ -33,19 +33,23 @@
 parameter topology = `TOPOLOGY_MESH;
 
 // total buffer size per port in flits
-parameter buffer_size = 16;
+parameter buffer_size = 64;
 
 // number of message classes (e.g. request, reply)
-parameter num_message_classes = 2;
+parameter num_message_classes = 1;
 
 // number of resource classes (e.g. minimal, adaptive)
 parameter num_resource_classes = 1;
 
 // number of VCs per class
-parameter num_vcs_per_class = 1;
+parameter num_vcs_per_class = 4;
+
+// (Raejoon: added for automated address and wiring)
+parameter topo_width = 4;
+parameter topo_height = 4;
 
 // total number of nodes
-parameter num_nodes = 64;
+parameter num_nodes = topo_width * topo_height;
 
 // number of dimensions in network
 parameter num_dimensions = 2;
@@ -54,7 +58,7 @@ parameter num_dimensions = 2;
 parameter num_nodes_per_router = 1;
 
 // select packet format
-parameter packet_format = `PACKET_FORMAT_EXPLICIT_LENGTH;
+parameter packet_format = `PACKET_FORMAT_HEAD_TAIL;
 
 // select type of flow control
 parameter flow_ctrl_type = `FLOW_CTRL_TYPE_CREDIT;
@@ -114,7 +118,7 @@ parameter fb_fast_peek = 1;
 parameter disable_static_reservations = 0;
 
 // use explicit pipeline register between flit buffer and crossbar?
-parameter explicit_pipeline_register = 1;
+parameter explicit_pipeline_register = 0;
 
 // gate flit buffer write port if bypass succeeds
 // (requires explicit pipeline register; may increase cycle time)
@@ -155,9 +159,9 @@ parameter sw_alloc_type = `SW_ALLOC_TYPE_SEP_IF;
 parameter sw_alloc_arbiter_type = `ARBITER_TYPE_ROUND_ROBIN_BINARY;
 
 // select speculation type for switch allocator
-parameter sw_alloc_spec_type = `SW_ALLOC_SPEC_TYPE_PRIO;
+parameter sw_alloc_spec_type = `SW_ALLOC_SPEC_TYPE_REQ;
 
 // select implementation variant for crossbar
-parameter crossbar_type = `CROSSBAR_TYPE_MUX;
+parameter crossbar_type = `CROSSBAR_TYPE_TRISTATE;
 
 parameter reset_type = `RESET_TYPE_ASYNC;

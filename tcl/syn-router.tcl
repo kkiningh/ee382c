@@ -1,3 +1,6 @@
+# Use multiple cores
+set_host_options -max_cores 16
+
 # Setup the technology libraries, Milkyway database, tech map, etc
 source ./tcl/common-setup.tcl
 
@@ -23,11 +26,11 @@ saif_map -start
 
 # The search path specifies where dc_shell will look for referenced designs 
 # as well as include files.
-set_app_var search_path [concat $search_path ${TEST_DIR} ./src/router/ ./src/clib/]
+set_app_var search_path [concat $search_path ${SEARCH_PATH}]
 
 # The set of directories that contain verilog source files. Can also contain
 # individual source files in seperate directories
-set src_directories { ${TEST_DIR} ./src/router/ ./src/clib/ }
+set src_directories [list ${SEARCH_PATH}]
 
 # The set of verilog files that should not be considered for analysis. This 
 # should only be inlcude files or files that don't actually contain verilog.
@@ -57,7 +60,7 @@ define_design_lib work -path ${BUILD_DIR}/work
 # Analyze reads in the specified verilog source files and creates a technology
 # independent representation in memory. Any verilog errors (should) get
 # reported here
-analyze $src_directories -autoread -top $TOP
+analyze $src_directories -autoread -top $TOP -format verilog
 
 # Elabortate the design.
 elaborate -architecture verilog $TOP
@@ -66,7 +69,7 @@ elaborate -architecture verilog $TOP
 current_design $TOP
 link
 
-check_design -no_warnings
+#check_design -no_warnings
 
 ################################################################################
 # Synthesis
@@ -193,9 +196,10 @@ group_path -name Regs_to_Regs -from [all_registers] -to [all_registers]
 
 # A SAIF file can be used for power optimization. Without this a default toggle
 # rate of 0.1 will be used for propagating switching activity
-read_saif -auto_map_names -input ${SAIF_PATH} -instance testbench/${TOP}_inst -verbose
+# read_saif -auto_map_names -input ${SAIF_PATH} -instance testbench/${TOP}_inst -verbose
 
 # Propagate the saif switching factors using static analyisis
+# Note: This is depreciated and unneeded in most cases
 #propagate_switching_activity -effort high
 
 # Setting power constraints will automatically enable power prediction using
@@ -214,9 +218,9 @@ set_preferred_routing_direction -layers {METAL2 METAL4 METAL6} -direction vertic
 set_ignored_layers -min_routing_layer METAL1
 set_ignored_layers -max_routing_layer METAL5
 
-report_ignored_layers
+#report_ignored_layers
 
-report_preferred_routing_direction
+#report_preferred_routing_direction
 
 # ------------------------------------------------------------------------------
 # Apply synthesis tool options
@@ -260,7 +264,7 @@ set compile_filter_prune_seq_cells false
 # Compile the design
 # ------------------------------------------------------------------------------
 
-compile_ultra -scan -gate_clock -no_autoungroup
+compile_ultra -scan -no_autoungroup -gate_clock
 
 # ------------------------------------------------------------------------------
 # Change names before output
@@ -315,8 +319,8 @@ saif_map -type ptpx -write_map ${BUILD_DIR}/reports/synthesis/${TOP}_SAIF.namema
 
 printvar > ${BUILD_DIR}/reports/synthesis/${TOP}.vars
 
-check_design -multiple_designs > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.check_design
+#check_design -multiple_designs > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.check_design
 
 check_timing > \
   ${BUILD_DIR}/reports/synthesis/${TOP}.check_timing
@@ -360,6 +364,31 @@ while {[gets $fr line] >= 0} {
 close $fr
 close $fw
 
+#foreach SAIF_FILE ${SAIF_FILES} {
+#    # Read in the SAIF file for the design
+#    read_saif -auto_map_names \
+#        -input $SAIF_FILE \
+#        -instance testbench/${TOP}_inst
+#
+#    # Get the rootname of the file for reports
+#    set SAIF_ROOT [file rootname [file tail ${SAIF_FILE}]]
+#
+#    # Report total power
+#    report_power -nosplit \
+#      > ${BUILD_DIR}/reports/synthesis/${TOP}.${SAIF_ROOT}.power
+#
+#    # Report the worst power users in the design
+#    report_power -nosplit -cell -nworst 20 \
+#      > ${BUILD_DIR}/reports/synthesis/${TOP}.${SAIF_ROOT}.20worst.power
+#
+#    # Report a detailed breakdown of all elements to the hierarchy depth given
+#    report_power -nosplit -hierarchy -hier_level 2 \
+#      > ${BUILD_DIR}/reports/synthesis/${TOP}.${SAIF_ROOT}.hier.power
+#
+#    # Reset the switching activity to the default
+#    reset_switching_activity
+#}
+
 report_timing -loops > \
   ${BUILD_DIR}/reports/synthesis/${TOP}.loops
 
@@ -368,62 +397,50 @@ report_area -nosplit \
             -physical > \
   ${BUILD_DIR}/reports/synthesis/${TOP}.area
 
-# Report overall average power broken down by dynamic and static usage
-report_power -nosplit \
-  > ${BUILD_DIR}/reports/synthesis/${TOP}.power
-
-# Report the worst power users in the design
-report_power -nosplit -cell -nworst 20 \
-  >> ${BUILD_DIR}/reports/synthesis/${TOP}.power
-
-# Report a detailed breakdown of all elements to the hierarchy depth given
-report_power -nosplit -hierarchy -hier_level 2 \
-  >> ${BUILD_DIR}/reports/synthesis/${TOP}.power
-
-report_constraint -all_violators \
-                  -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.constraint_violators
-
-report_design > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.design_attributes
-
-report_clocks -attributes \
-              -skew > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.clocks
-
-report_clock_gating -multi_stage \
-                    -verbose \
-                    -gated \
-                    -ungated \
-  > ${BUILD_DIR}/reports/synthesis/${TOP}.clock_gating
-
-report_clock_tree -summary \
-                  -settings \
-                  -structure > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.clock_tree
-
-query_objects -truncate 0 [all_registers -level_sensitive ] \
-  > ${BUILD_DIR}/reports/synthesis/${TOP}.latches
-
-report_isolate_ports -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.isolate_ports
-
-report_net_fanout -threshold 32 -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.high_fanout_nets
-
-report_port -verbose \
-            -nosplit > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.port
-
-report_hierarchy > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.hierarchy
-
-report_resources -hierarchy > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.resources
-
-report_compile_options > \
-  ${BUILD_DIR}/reports/synthesis/${TOP}.compile_options
-
+#report_constraint -all_violators \
+#                  -nosplit > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.constraint_violators
+#
+#report_design > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.design_attributes
+#
+#report_clocks -attributes \
+#              -skew > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.clocks
+#
+#report_clock_gating -multi_stage \
+#                    -verbose \
+#                    -gated \
+#                    -ungated \
+#  > ${BUILD_DIR}/reports/synthesis/${TOP}.clock_gating
+#
+#report_clock_tree -summary \
+#                  -settings \
+#                  -structure > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.clock_tree
+#
+#query_objects -truncate 0 [all_registers -level_sensitive ] \
+#  > ${BUILD_DIR}/reports/synthesis/${TOP}.latches
+#
+#report_isolate_ports -nosplit > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.isolate_ports
+#
+#report_net_fanout -threshold 32 -nosplit > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.high_fanout_nets
+#
+#report_port -verbose \
+#            -nosplit > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.port
+#
+#report_hierarchy > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.hierarchy
+#
+#report_resources -hierarchy > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.resources
+#
+#report_compile_options > \
+#  ${BUILD_DIR}/reports/synthesis/${TOP}.compile_options
+#
 report_congestion > \
   ${BUILD_DIR}/reports/synthesis/${TOP}.congestion
 
@@ -441,3 +458,5 @@ report_timing -delay max \
 report_qor > \
   ${BUILD_DIR}/reports/synthesis/${TOP}_zero-interconnect.qor
 set_zero_interconnect_delay_mode false
+
+quit
