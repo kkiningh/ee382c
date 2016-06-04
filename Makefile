@@ -1,6 +1,6 @@
 # First target is default
 .PHONY: all
-all: synth_all
+all: sim_all
 
 # Use /tmp/ for builds since otherwise we can run into AFS errors :(
 BUILD = /tmp/$(shell whoami)/ee382c
@@ -51,7 +51,7 @@ sim_all: $(BUILD)/torus4x4/rate_50.saif.gz
 
 sim_all: $(BUILD)/fbfly4x4/rate_12.saif.gz
 sim_all: $(BUILD)/fbfly4x4/rate_25.saif.gz
-sim_all: $(BUILD)/fbfly4x4/rate_38.saif.gz
+sim_all: $(BUILD)/fbfly4x4/rate_37.saif.gz
 sim_all: $(BUILD)/fbfly4x4/rate_50.saif.gz
 
 # Include the dependency information.
